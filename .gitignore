@@ -224,3 +224,6 @@ dashboard/public/assets/*.mp4
 
 # Node modules
 dashboard/node_modules/
+
+#MAC File 
+.DS_Store
