@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Heavy data and videos
+data/raw/
+data/processed/
+dashboard/public/assets/*.mp4
+
+# Node modules
+dashboard/node_modules/
