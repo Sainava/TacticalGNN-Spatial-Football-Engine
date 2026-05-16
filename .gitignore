@@ -227,3 +227,5 @@ dashboard/node_modules/
 
 #MAC File 
 .DS_Store
+
+models/*
