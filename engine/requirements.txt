@@ -2,4 +2,10 @@ pandas
 numpy 
 matplotlib
 scipy
+scikit-learn
 shapely
+tqdm
+torch
+torchvision
+torchaudio
+torch_geometric
