@@ -68,7 +68,9 @@ tactical-ghosting-engine/
             └── (other UI components)
 ```
 
-**[Live Interactive Dashboard]((#))** ## System Overview
+**[Live Interactive Dashboard](([#](https://tactical-gnn-spatial-football-engin.vercel.app/)))** 
+
+## System Overview
 
 Standard optical tracking data in football is mathematically "blind"—it provides $X/Y$ coordinates but lacks contextual awareness of pressure, threat, and spatial dominance. **TacticalGNN** bridges this gap by combining a deterministic physics engine with Geometric Deep Learning. 
 
