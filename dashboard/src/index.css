@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    /* A deep, rich slate/navy background to make the neon accents pop */
+    @apply bg-slate-900 text-slate-100 antialiased overflow-hidden;
+  }
+}
