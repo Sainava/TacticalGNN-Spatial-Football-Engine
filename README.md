@@ -67,8 +67,7 @@ tactical-ghosting-engine/
             ├── PressureChart.jsx
             └── (other UI components)
 ```
-
-**[Live Interactive Dashboard](([#](https://tactical-gnn-spatial-football-engin.vercel.app/)))** 
+**[Live Interactive Dashboard](https://tactical-gnn-spatial-football-engin.vercel.app/)**
 
 ## System Overview
 
