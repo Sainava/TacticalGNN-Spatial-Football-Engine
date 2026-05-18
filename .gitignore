@@ -230,10 +230,6 @@ dashboard/node_modules/
 
 models/*
 
-
-dashboard/public/data
-
-
 # Logs
 dashboard/logs
 dashboard/*.log
