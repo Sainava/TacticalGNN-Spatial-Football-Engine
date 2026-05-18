@@ -258,3 +258,5 @@ dashboard/*.ntvs*
 dashboard/*.njsproj
 dashboard/*.sln
 dashboard/*.sw?
+
+dashboard/.vite
