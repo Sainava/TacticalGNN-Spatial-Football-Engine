@@ -180,20 +180,3 @@ The dashboard will be available at `http://localhost:5173`.
 ---
 
 *Developed by Sainava Modak .*
-
-```
-
-***
-
-### How to fill those GIF placeholders:
-To make this README truly elite, you need 4 high-quality GIFs. You can record your screen using a tool like OBS, Kap, or even Mac/Windows built-in screen recorders. 
-1. **Dashboard Preview:** Record yourself clicking the "Pipeline" toggles (Raw -> Kinematics -> GNN) on the React dashboard.
-2. **GNN Inference:** Record your `inference_visualizer.py` running in Matplotlib (or the dashboard if it looks cleaner).
-3. **Pitch Control:** Record the output of your `dynamic_control.py` script.
-4. **Defensive Line:** Record the output of your `animate_defensive_line.py` script.
-
-Drop those `.gif` files into a `docs/assets/` folder in your repo, and the README will automatically render them. 
-
-This is exactly what a top-tier engineering portfolio looks like. Ready to push?
-
-```
