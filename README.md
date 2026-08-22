@@ -81,7 +81,7 @@ This engine processes raw optical and event data (via Metrica Sports) to calcula
 ![Attacking Goal Sequence](docs/assets/Goal.gif)
 *Caption: Final Third Conversion edge-case. The kinematic engine tracks spatial stress and dynamically recalculates Time-To-Intercept (TTI) as the attacking team penetrates the penalty box to execute a successful strike.*
 
-## 🚀 Key Analytical Features & Visualizations
+##  Key Analytical Features & Visualizations
 
 The engine is split into highly specialized analytical modules, allowing for both isolated testing and full pipeline integration.
 
