@@ -5,7 +5,7 @@
 [![React](https://img.shields.io/badge/React-Vite-61DAFB.svg)](https://reactjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC.svg)](https://tailwindcss.com/)
 
-> A deep learning and kinematics engine for real-time spatial analytics in football, powered by Graph Neural Networks (GNN).
+> A deep learning and kinematics engine for spatial analytics in football, using a carrier-centric Graph Neural Network (GNN) to estimate short-term possession retention.
 
 ```text
 tactical-ghosting-engine/
@@ -67,49 +67,61 @@ tactical-ghosting-engine/
             ├── PressureChart.jsx
             └── (other UI components)
 ```
+
 **[Live Interactive Dashboard](https://tactical-gnn-spatial-football-engin.vercel.app/)**
 
 ## System Overview
 
-Standard optical tracking data in football is mathematically "blind"—it provides $X/Y$ coordinates but lacks contextual awareness of pressure, threat, and spatial dominance. **TacticalGNN** bridges this gap by combining a deterministic physics engine with Geometric Deep Learning. 
+Standard optical tracking data in football provides $X/Y$ coordinates but does not directly encode contextual information such as dynamic pressure around the ball carrier. **TacticalGNN** bridges this gap by combining deterministic kinematic processing with Geometric Deep Learning.
 
-This engine processes raw optical and event data (via Metrica Sports) to calculate player kinematics, model spatial dominance via Voronoi structures, and utilize a Graph Neural Network (CCSNet architecture) to predict dynamic threat and Time-To-Intercept (TTI) in real-time.
+This engine processes raw optical tracking data from Metrica Sports to calculate player kinematics, construct a carrier-centric spatial graph using distance, closing speed, and Time-To-Intercept (TTI), and use a Graph Neural Network (CCSNet architecture) to estimate the probability that the current carrier's team will retain possession three seconds into the future.
+
+Event data is used separately to identify interesting match scenarios for visualization and export; it is not used to generate the GNN training labels.
 
 ![Dashboard Preview Placeholder](docs/assets/dashboard_preview.gif)
-*Caption: The React telemetry dashboard processing a 50-second, 18-pass build-up sequence, visualizing GNN inference layers in real-time.*
+*Caption: The React telemetry dashboard replaying a 50-second, 18-pass build-up sequence using precomputed GNN and kinematic outputs.*
 
 ![Attacking Goal Sequence](docs/assets/Goal.gif)
-*Caption: Final Third Conversion edge-case. The kinematic engine tracks spatial stress and dynamically recalculates Time-To-Intercept (TTI) as the attacking team penetrates the penalty box to execute a successful strike.*
+*Caption: Final Third Conversion edge-case. The kinematic engine tracks player movement and dynamically recalculates Time-To-Intercept (TTI) as the attacking team penetrates the penalty box.*
 
-##  Key Analytical Features & Visualizations
+## Key Analytical Features & Visualizations
 
-The engine is split into highly specialized analytical modules, allowing for both isolated testing and full pipeline integration.
+The engine is split into specialized analytical modules, allowing for isolated testing and full pipeline integration.
 
 ### 1. Geometric Deep Learning (GNN) Layer
-The core "brain" of the engine evaluates the pitch as a fully connected graph.
-* **Nodes & Edges:** Players are modeled as nodes; passing lanes and interception vectors are modeled as dynamic edges.
-* **Threat Halo Inference:** Evaluates the survival probability of possession by calculating the Time-To-Intercept (TTI) for surrounding defenders based on current velocity vectors.
+
+The core "brain" of the engine represents the pitch as a **carrier-centric directed ego-graph**.
+
+* **Nodes & Edges:** Players are modeled as nodes, with the current ball carrier as the central node. Relevant surrounding players are connected to the carrier through dynamic directed edges.
+* **Node Features:** Each player is represented using position, velocity, and team-relative information: `[X, Y, VX, VY, is_teammate]`.
+* **Edge Features:** Relationships with the carrier include `[distance, TTI, closing_speed, is_teammate]`.
+* **Possession Retention Inference:** The GNN estimates the probability that the carrier's team will still have possession three seconds later. TTI is used as an input edge feature rather than being directly predicted by the GNN.
 * *(Backend Module: `engine/models/inference_visualizer.py`)*
 
-![GNN Inference Placeholder](docs/assets/gnn_inference.gif) 
+![GNN Inference Placeholder](docs/assets/gnn_inference.gif)
 
 ### 2. Kinematic & Spatial Control Engine
-Applies Newtonian physics to raw positional data to understand momentum and pitch ownership.
-* **Dynamic Pitch Control:** Upgrades static Voronoi tessellations into dynamic ownership maps, calculating which team controls specific zones based on player momentum.
-* **Velocity Vectors:** Derives acceleration and directional intent from raw coordinate changes over time.
+
+Applies deterministic kinematic calculations to raw positional data to understand player movement and provide additional spatial context.
+
+* **Dynamic Pitch Control:** Experimental modules extend standard Voronoi tessellations by projecting player positions forward using their current velocity before calculating spatial regions.
+* **Velocity Vectors:** Derives X/Y velocity and speed from raw coordinate changes over time. The current implementation does not calculate acceleration.
+* **Time-To-Intercept:** Estimates how quickly a surrounding player could reach the carrier using distance and closing speed.
 * *(Backend Modules: `engine/physics/dynamic_control.py`, `engine/physics/kinematics.py`)*
 
 ![Pitch Control Placeholder](docs/assets/spatial_control.gif)
 
 ### 3. Tactical Shape Diagnostics
-Mathematical tracking of team structure during different phases of play.
-* **Defensive Line Tracking:** Algorithmically isolates the back line to measure defensive depth and structural integrity.
-* **Passing Networks:** Visualizes ball progression and structural links during sustained possession.
-* *(Backend Modules: `engine/analytics/defensive_line.py`, `engine/analytics/passing_lanes.py`)*
+
+Additional experimental analytical modules are included for exploring tactical structure and passing behavior.
+
+* **Defensive Line Tracking:** Experimental tactical-shape analysis.
+* **Passing Networks:** Experimental visualization of ball progression and player relationships during possession.
+* These modules are separate from the core GNN training and inference pipeline.
 
 ![Defensive Line Placeholder](docs/assets/defensive_line.gif)
 
-##  System Architecture
+## System Architecture
 
 The project is structured as a monorepo, separating the heavy data processing/model training from the lightweight web visualizer.
 
@@ -119,7 +131,7 @@ tactical-ghosting-engine/
 │   ├── analytics/           # Tactical shape and passing heuristics
 │   ├── models/              # GNN architecture, CCSNet training & inference
 │   ├── parsers/             # Ingestion pipelines for raw optical/event data
-│   └── physics/             # Kinematics and dynamic spatial control calculations
+│   └── physics/             # Kinematics and spatial control calculations
 └── dashboard/               # The Face (React / Vite / Tailwind)
     └── src/components/      # Interactive telemetry UI and canvas renderers
 
@@ -127,20 +139,21 @@ tactical-ghosting-engine/
 
 ### The Engineering Pipeline
 
-1. **Parser Layer:** Merges Home/Away tracking data and syncs with semantic Event Data.
-2. **Physics Layer:** Computes velocity, acceleration, and dynamic spatial boundaries.
-3. **Inference Layer:** PyTorch GNN evaluates spatial stress and outputs survival probabilities.
-4. **Export Layer:** Curated edge-cases (Goals, Turnovers, Scrambles) are serialized into lightweight JSON payloads.
-5. **Presentation Layer:** A zero-lag React dashboard renders the multidimensional arrays via an interactive SVG canvas.
+1. **Parser Layer:** Merges Home/Away tracking data, cleans the coordinates, and transforms them into a centered metric pitch representation.
+2. **Kinematics Layer:** Computes player velocity and speed from positional changes over time.
+3. **Graph Construction Layer:** Identifies the ball carrier and constructs a dynamic carrier-centric ego-graph using player kinematics, spatial relationships, and TTI.
+4. **Inference Layer:** PyTorch GNN processes the graph and outputs a possession-retention probability.
+5. **Export Layer:** Curated scenarios (Goals, Turnovers, Corners, and other selected sequences) are processed and serialized into lightweight JSON payloads.
+6. **Presentation Layer:** A React dashboard renders the precomputed JSON outputs through an interactive SVG visualization.
 
-##  Tech Stack
+## Tech Stack
 
 * **Machine Learning & Data:** PyTorch, PyTorch Geometric, Pandas, NumPy, SciPy
 * **Physics & Visualization (Python):** Matplotlib (for backend testing/diagnostics)
 * **Frontend Web Application:** React.js, Vite, Tailwind CSS
 * **Data Source:** [Metrica Sports Open Data](https://github.com/metrica-sports/sample-data)
 
-## 💻 Local Installation & Usage
+##  Local Installation & Usage
 
 ### 1. The Python Engine (Backend)
 
@@ -162,7 +175,7 @@ python export_scenario.py
 
 ### 2. The React Dashboard (Frontend)
 
-Navigate to the `dashboard` directory to run the live visualizer.
+Navigate to the `dashboard` directory to run the visualizer.
 
 ```bash
 cd dashboard
@@ -173,7 +186,7 @@ npm run dev
 
 The dashboard will be available at `http://localhost:5173`.
 
-##  Acknowledgments
+## Acknowledgments
 
 * Optical tracking and event datasets provided by [Metrica Sports](https://github.com/metrica-sports).
 
