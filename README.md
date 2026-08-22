@@ -1,4 +1,4 @@
-# Tactical-Ghosting-Engine
+# TacticalGNN-Spatial-Football-Engine
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-Geometric-EE4C2C.svg)](https://pytorch.org/)
