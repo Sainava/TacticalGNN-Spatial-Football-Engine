@@ -230,6 +230,8 @@ dashboard/node_modules/
 
 models/*
 
+forensic_audit_report.md
+
 # Logs
 dashboard/logs
 dashboard/*.log
